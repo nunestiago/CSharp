@@ -42,12 +42,14 @@ namespace IreBank
             Console.WriteLine("--- Welcome to the IreBank Employee ---");
             Console.WriteLine("1 - Create Customer");
             Console.WriteLine("2 - Delete Customer");
-            Console.WriteLine("3 - Show All Customers");
-            Console.WriteLine("4 - Main menu");
-            Console.WriteLine("5 - Exit");
+            Console.WriteLine("3 - Lodgement");
+            Console.WriteLine("4 - Withdraw");
+            Console.WriteLine("5 - Show All Customers");
+            Console.WriteLine("6 - Main menu");
+            Console.WriteLine("7 - Exit");
             Console.Write(">");
             string inputLine = Console.ReadLine();
-            while (!inputLine.Equals("") && !inputLine.ToLower().Equals("5"))
+            while (!inputLine.Equals("") && !inputLine.ToLower().Equals("7"))
             {
                 if (inputLine.Equals("1"))
                 {
@@ -60,9 +62,17 @@ namespace IreBank
                 }
                 else if (inputLine.Equals("3"))
                 {
-                    ShowAll();
+                    Lodgement();
                 }
                 else if (inputLine.Equals("4"))
+                {
+                    Console.WriteLine("Withdraw");
+                }
+                else if (inputLine.Equals("5"))
+                {
+                    ShowAll();
+                }
+                else if (inputLine.Equals("6"))
                 {
                     Welcome main = new();
                     main.Screen();
@@ -111,7 +121,7 @@ namespace IreBank
             string email = Console.ReadLine();
             FileName fileName = new();
             string file = fileName.NameConverter(custName, custSurname);
-            sw.WriteLine($"{file} \t {custName} \t {custSurname} \t {email}");
+            sw.WriteLine($"{file}\t{custName}\t{custSurname}\t{email}");
             sw.Close();
             EmpMenu();
         }
@@ -126,6 +136,68 @@ namespace IreBank
             }
             sr.Close();
             EmpMenu();
+        }
+
+        public void Lodgement()
+        {
+            Console.WriteLine("Please insert customer id:");
+            Console.WriteLine("ex: xx-nn-yy-zz");
+            Console.Write("> ");
+            string customer = Console.ReadLine();
+            Console.WriteLine("From which account:");
+            Console.WriteLine("1 - Current");
+            Console.WriteLine("2 - Savings");
+            Console.WriteLine("3 - Employee menu");
+            Console.WriteLine("4 - Main menu");
+            Console.WriteLine("5 - Exit");
+            Console.Write("> ");
+
+            string whichAcc = Console.ReadLine();
+            while (!whichAcc.Equals("") && !whichAcc.ToLower().Equals("5"))
+            {
+                if (whichAcc.Equals("1"))
+                {
+                    whichAcc = "current";
+                }
+                else if (whichAcc.Equals("2"))
+                {
+                    whichAcc = "savings";
+                }
+                else if (whichAcc.Equals("3"))
+                {
+                    EmpMenu();
+                }
+                else if (whichAcc.Equals("4"))
+                {
+                    Welcome main = new();
+                    main.Screen();
+                }
+                else
+                {
+                    Console.WriteLine("Please insert proper value: ");
+                    Console.Write(">");
+                    whichAcc = Console.ReadLine();
+                }
+            }
+            Console.WriteLine($"How much would you like to deposit?");
+            Console.Write("> ");
+
+            string value = Console.ReadLine();
+            DateTime thisDay = DateTime.Today;
+            string curFile = @$"{customer}-{whichAcc.ToLower()}.txt";
+            if (File.Exists(curFile)) {
+                using StreamWriter sw = File.AppendText(path);
+                sw.WriteLine($"{thisDay.ToString("d")}\t Lodgement\t{value}\t");
+                sw.Close();
+
+            }
+            else
+            {
+                using StreamWriter sw = File.CreateText(path);
+                sw.WriteLine($"{thisDay.ToString("d")}\t Lodgement\t{value}\t{value}");
+
+                sw.Close();
+            }
         }
     }
 }
