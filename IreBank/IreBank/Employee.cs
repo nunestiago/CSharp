@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using IreBank.Utils;
 
 namespace IreBank
@@ -77,6 +78,10 @@ namespace IreBank
                     Welcome main = new();
                     main.Screen();
                 }
+                else if (inputLine.Equals("7"))
+                {
+                    Environment.Exit(0);
+                }
                 else
                 {
                     Console.WriteLine("Please insert proper value: ");
@@ -86,7 +91,7 @@ namespace IreBank
             }
         }
 
-        private readonly string path = Environment.CurrentDirectory + "customers.txt";
+        private readonly string path = AppDomain.CurrentDomain.BaseDirectory + "customers.txt";
 
         public void CreateCustFile()
         {
@@ -144,6 +149,7 @@ namespace IreBank
             Console.WriteLine("ex: xx-nn-yy-zz");
             Console.Write("> ");
             string customer = Console.ReadLine();
+
             Console.WriteLine("From which account:");
             Console.WriteLine("1 - Current");
             Console.WriteLine("2 - Savings");
@@ -151,17 +157,19 @@ namespace IreBank
             Console.WriteLine("4 - Main menu");
             Console.WriteLine("5 - Exit");
             Console.Write("> ");
-
             string whichAcc = Console.ReadLine();
+
             while (!whichAcc.Equals("") && !whichAcc.ToLower().Equals("5"))
             {
                 if (whichAcc.Equals("1"))
                 {
                     whichAcc = "current";
+                    AccOperation(customer, whichAcc);
                 }
                 else if (whichAcc.Equals("2"))
                 {
                     whichAcc = "savings";
+                    AccOperation(customer, whichAcc);
                 }
                 else if (whichAcc.Equals("3"))
                 {
@@ -179,24 +187,39 @@ namespace IreBank
                     whichAcc = Console.ReadLine();
                 }
             }
+        }
+
+        private void AccOperation(string customer, string whichAcc)
+        {
             Console.WriteLine($"How much would you like to deposit?");
             Console.Write("> ");
-
             string value = Console.ReadLine();
-            DateTime thisDay = DateTime.Today;
-            string curFile = @$"{customer}-{whichAcc.ToLower()}.txt";
-            if (File.Exists(curFile)) {
-                using StreamWriter sw = File.AppendText(path);
-                sw.WriteLine($"{thisDay.ToString("d")}\t Lodgement\t{value}\t");
-                sw.Close();
 
+            DateTime thisDay = DateTime.Today;
+            string curFile = @$"{AppDomain.CurrentDomain.BaseDirectory}{customer}-{whichAcc.ToLower()}.txt";
+
+            if (File.Exists(curFile))
+            {
+                string last = File.ReadLines(curFile).Last();
+                Console.WriteLine(curFile);
+                Console.WriteLine(last);
+                string[] total = last.Split('\t');
+                float fullLodge = float.Parse(value) + float.Parse(total[3]);
+                using StreamWriter sw = File.AppendText(curFile);
+                sw.WriteLine($"{thisDay:d}\t Lodgement\t{value}\t{fullLodge}");
+                Console.WriteLine("Funds lodged");
+                sw.Close();
+                EmpMenu();
             }
             else
             {
-                using StreamWriter sw = File.CreateText(path);
-                sw.WriteLine($"{thisDay.ToString("d")}\t Lodgement\t{value}\t{value}");
+                using StreamWriter sw = File.CreateText(curFile);
+                Console.WriteLine(curFile);
 
+                sw.WriteLine($"{thisDay:d}\tLodgement\t{value}\t{value}");
+                Console.WriteLine("Funds lodged");
                 sw.Close();
+                EmpMenu();
             }
         }
     }
